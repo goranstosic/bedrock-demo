@@ -1,54 +1,110 @@
-<p align="center">
-  <a href="https://roots.io/bedrock/">
-    <img alt="Bedrock" src="https://cdn.roots.io/app/uploads/logo-bedrock.svg" height="100">
-  </a>
-</p>
+# Northwind Demo
 
-<p align="center">
-  <a href="https://packagist.org/packages/roots/bedrock"><img alt="Packagist Installs" src="https://img.shields.io/packagist/dt/roots/bedrock?label=projects%20created&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <a href="https://packagist.org/packages/roots/wordpress"><img alt="roots/wordpress Packagist Downloads" src="https://img.shields.io/packagist/dt/roots/wordpress?label=roots%2Fwordpress%20downloads&logo=roots&logoColor=white&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/roots/bedrock/master/composer.json&label=wordpress&logo=roots&logoColor=white&query=$.require[%22roots/wordpress%22]&colorB=2b3072&colorA=525ddc&style=flat-square">
-  <a href="https://github.com/roots/bedrock/actions/workflows/ci.yml"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/roots/bedrock/ci.yml?branch=master&logo=github&label=CI&style=flat-square"></a>
-  <a href="https://twitter.com/rootswp"><img alt="Follow Roots" src="https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square"></a>
-  <a href="https://github.com/sponsors/roots"><img src="https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=" alt="Sponsor Roots"></a>
-</p>
+A production-grade WordPress marketing site for a fictional technology consultancy, built the way a real client project would be: Composer-managed with [Roots Bedrock](https://roots.io/bedrock/), a block theme with ACF Pro blocks, a versioned content model, automated coding standards and accessibility checks, and push-to-deploy to WP Engine.
 
-<p align="center">WordPress boilerplate with Composer, easier configuration, and an improved folder structure</p>
+Every company, figure and client story in the seeded content is fictional.
 
-<p align="center">
-  <a href="https://roots.io/bedrock/">Website</a> &nbsp;&nbsp; <a href="https://roots.io/bedrock/docs/installation/">Documentation</a> &nbsp;&nbsp; <a href="https://github.com/roots/bedrock/releases">Releases</a> &nbsp;&nbsp; <a href="https://discourse.roots.io/">Community</a>
-</p>
+[![CI](https://github.com/goranstosic/bedrock-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/goranstosic/bedrock-demo/actions/workflows/ci.yml)
+[![Accessibility](https://github.com/goranstosic/bedrock-demo/actions/workflows/a11y.yml/badge.svg)](https://github.com/goranstosic/bedrock-demo/actions/workflows/a11y.yml)
 
-## Support us
+## What it shows
 
-Roots is an independent open source org, supported only by developers like you. Your sponsorship funds [WP Packages](https://wp-packages.org/) and the entire Roots ecosystem, and keeps them independent. Support us by purchasing [Radicle](https://roots.io/radicle/) or [sponsoring us on GitHub](https://github.com/sponsors/roots) — sponsors get access to our private Discord.
+| Area | What is in this repository |
+| --- | --- |
+| Stack | Bedrock, PHP 8.3, WordPress 7.1, MariaDB 10.11, DDEV |
+| Dependencies | WordPress core, plugins and ACF Pro installed by Composer; nothing third-party is committed |
+| Content model | `Sector` and `Client story` post types, a `Region` taxonomy, and a bidirectional ACF relationship between sectors and stories, all in a must-use plugin so it survives a theme change |
+| Blocks | Three ACF blocks (Stats, Client Story Cards, Region Switcher) with escaped output, empty states and token-only CSS |
+| Regions | Visitors pick Global, US, UK or Australia; stories tagged Global show everywhere. The region travels as `?region=uk`, so every page stays cacheable |
+| Editorial tooling | A pattern, an Appearance > Pattern library screen, and an [editor guide](docs/editor-guide.md) |
+| Migration tooling | `wp northwind redirects import`, an idempotent CSV importer for the Redirection plugin with a dry run |
+| Quality gates | PHPCS with WordPress Coding Standards and PHPCompatibility, axe-core and keyboard tests with Playwright, actionlint, all on every pull request |
+| Delivery | GitHub Actions deploys `staging` and `main` to WP Engine; Dependabot keeps Composer, npm and Actions up to date |
 
-### Sponsors
+## Quick start
 
-<a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" height="90"></a> <a href="https://wordpress.com/"><img src="https://cdn.roots.io/app/uploads/wordpress.svg" alt="WordPress.com" height="90"></a> <a href="https://www.itineris.co.uk/"><img src="https://cdn.roots.io/app/uploads/itineris.svg" alt="Itineris" height="90"></a> <a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" height="90"></a> <a href="https://ploi.io/"><img src="https://cdn.roots.io/app/uploads/ploi.svg" alt="Ploi" height="90"></a>
+You need [DDEV](https://ddev.com/get-started/) and an ACF Pro license key.
 
-## Overview
+```sh
+git clone https://github.com/goranstosic/bedrock-demo.git
+cd bedrock-demo
 
-Bedrock is a WordPress boilerplate for developers that want to manage their projects with Git and Composer. Much of the philosophy behind Bedrock is inspired by the [Twelve-Factor App](http://12factor.net/) methodology, including the [WordPress specific version](https://roots.io/twelve-factor-wordpress/).
+# The key stays on your machine: .ddev/.env is gitignored.
+echo "ACF_PRO_KEY=your-key-here" > .ddev/.env
 
-- Better folder structure
-- Dependency management with [Composer](https://getcomposer.org)
-  - [`roots/wordpress`](https://wp-packages.org/wordpress-core) package for WordPress core
-  - [WP Packages](https://wp-packages.org/) repository for WordPress plugins and themes
-- Easy WordPress configuration with environment specific files
-- Environment variables with [Dotenv](https://github.com/vlucas/phpdotenv)
-- Autoloader for mu-plugins (use regular plugins as mu-plugins)
+ddev start
+ddev setup
+```
 
-## Getting Started
+`ddev setup` installs Composer dependencies, creates `.env` with fresh salts, installs WordPress, activates the plugins and theme, seeds the demo content and imports the sample redirects. It is safe to run again.
 
-See the [Bedrock installation documentation](https://roots.io/bedrock/docs/installation/).
+- Site: <https://northwind-demo.ddev.site>
+- Admin: <https://northwind-demo.ddev.site/wp/wp-admin> (user `admin`, password `admin`)
 
-## Community
+Things to try:
 
-Keep track of development and community news.
+- `/sectors/financial-services/`, then switch region in the header. The client story cards change with the region.
+- `/sectors/public-sector/` has a story for Australia only, so the cards block renders nothing in other regions.
+- `/industries/banking/` is a redirect imported from `data/redirects.csv`.
+- Appearance > Pattern library lists the patterns and the blocks each one uses.
 
-- Join us on Discord by [sponsoring us on GitHub](https://github.com/sponsors/roots)
-- Join us on [Roots Discourse](https://discourse.roots.io/)
-- Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-- Follow the [Roots Blog](https://roots.io/blog/)
-- Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
+## Everyday commands
+
+| Command | What it does |
+| --- | --- |
+| `ddev composer lint` | Check PHP against the coding standards |
+| `ddev composer lint:fix` | Fix what can be fixed automatically |
+| `scripts/a11y.sh` | Run the axe and keyboard tests against the local site (needs Node.js 20+) |
+| `ddev wp northwind seed` | Create any missing demo content |
+| `ddev wp northwind redirects import data/redirects.csv --dry-run` | Preview a redirect import |
+| `ddev exec composer build:wpengine` | Build the WP Engine artifact into `build/wp-content` |
+
+## Repository layout
+
+```
+config/                         Bedrock configuration (environment specific in config/environments)
+data/redirects.csv              Sample redirect map for the importer
+web/app/mu-plugins/northwind-core/
+  northwind-core.php            Bootstraps the content model
+  src/                          PSR-4 classes: post types, taxonomy, region, queries, CLI commands
+  acf-json/                     ACF field groups, versioned as JSON
+web/app/themes/northwind/
+  theme.json                    Design tokens: colour, type, spacing
+  templates/, parts/            Block templates and template parts
+  blocks/<name>/                block.json, render.php and style.css for each block
+  patterns/                     Block patterns
+scripts/                        Build, deploy, accessibility and GitHub setup scripts
+tests/a11y/                     Playwright and axe-core tests
+docs/                           Block standards, editor guide, deploy guide
+```
+
+## Branches and delivery
+
+```
+feature/*  ->  develop  ->  staging  ->  main
+                           (WP Engine    (WP Engine
+                            staging)      production)
+```
+
+- Work happens on short-lived branches off `develop`, merged by pull request.
+- Every pull request runs **Lint**, **WP Engine build** and **Accessibility**. `main` is protected and needs all three to pass (see `scripts/protect-main.sh`).
+- A push to `staging` or `main` builds a flat `wp-content` artifact and deploys it to the matching WP Engine environment. Full details, including first-time setup and rollback, are in [docs/wpengine-deploy.md](docs/wpengine-deploy.md).
+
+## Secrets
+
+Nothing secret is committed. The ACF Pro key lives in:
+
+- `.ddev/.env` locally (gitignored),
+- the `ACF_PRO_KEY` Actions secret and Dependabot secret on GitHub.
+
+`auth.json`, `.env` files and the ACF Pro plugin itself are gitignored, and CI fails if the key ever shows up in the build artifact. Pull requests from forks do not receive secrets, so their checks that install ACF Pro will fail; a maintainer can rerun them from a branch.
+
+## Further reading
+
+- [Block standards](docs/block-standards.md): how blocks in this repository are built and reviewed
+- [Editor guide](docs/editor-guide.md): for the people who write the content
+- [WP Engine deploy](docs/wpengine-deploy.md): setup, day-to-day deploys and recovery
+
+## License
+
+[MIT](LICENSE). Based on Roots Bedrock, also MIT.
