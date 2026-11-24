@@ -1,0 +1,58 @@
+name: Accessibility
+
+on:
+  pull_request:
+  push:
+    branches: [develop, staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  axe:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pass the ACF key to DDEV
+        env:
+          ACF_PRO_KEY: ${{ secrets.ACF_PRO_KEY }}
+        run: |
+          test -n "$ACF_PRO_KEY" || { echo "::error::The ACF_PRO_KEY secret is not available."; exit 1; }
+          printf 'ACF_PRO_KEY=%s\n' "$ACF_PRO_KEY" > .ddev/.env
+
+      - uses: ddev/github-action-setup-ddev@v1
+
+      - name: Install WordPress and seed the demo content
+        run: ddev setup
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tests/a11y/package-lock.json
+
+      - name: Install test dependencies
+        working-directory: tests/a11y
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Run axe and keyboard checks
+        working-directory: tests/a11y
+        run: npx playwright test
+
+      - name: Upload the report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: a11y-report
+          path: tests/a11y/playwright-report
+          retention-days: 14
