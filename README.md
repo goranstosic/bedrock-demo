@@ -19,7 +19,7 @@ Every company, figure and client story in the seeded content is fictional.
 | Editorial tooling | A pattern, an Appearance > Pattern library screen, and an [editor guide](docs/editor-guide.md) |
 | Migration tooling | `wp northwind redirects import`, an idempotent CSV importer for the Redirection plugin with a dry run |
 | Quality gates | PHPCS with WordPress Coding Standards and PHPCompatibility, axe-core and keyboard tests with Playwright, actionlint, all on every pull request |
-| Delivery | GitHub Actions deploys `staging` and `main` to WP Engine; Dependabot keeps Composer, npm and Actions up to date |
+| Delivery | GitHub Actions deploys `develop` to WP Engine development, `staging` to staging and `main` to production, and posts each result to Slack or Teams; Dependabot keeps Composer, npm and Actions up to date |
 
 ## Quick start
 
@@ -81,14 +81,29 @@ docs/                           Block standards, editor guide, deploy guide
 ## Branches and delivery
 
 ```
-feature/*  ->  develop  ->  staging  ->  main
-                           (WP Engine    (WP Engine
-                            staging)      production)
+feature/*  ->  develop        ->  staging      ->  main
+               (WP Engine         (WP Engine       (WP Engine
+                development)       staging)         production)
 ```
 
 - Work happens on short-lived branches off `develop`, merged by pull request.
 - Every pull request runs **Lint**, **WP Engine build** and **Accessibility**. `main` is protected and needs all three to pass (see `scripts/protect-main.sh`).
-- A push to `staging` or `main` builds a flat `wp-content` artifact and deploys it to the matching WP Engine environment. Full details, including first-time setup and rollback, are in [docs/wpengine-deploy.md](docs/wpengine-deploy.md).
+- A push to `develop`, `staging` or `main` builds a flat `wp-content` artifact and deploys it to the matching WP Engine environment: development for the team, staging for client sign-off, production for the live site. Each environment is skipped with a notice until it is configured.
+- When the optional `DEPLOY_WEBHOOK_URL` secret is set, every deploy result, including failures, is posted to a Slack or Teams channel.
+- Full details, including first-time setup and rollback, are in [docs/wpengine-deploy.md](docs/wpengine-deploy.md).
+
+## Regions in production
+
+The demo passes the visitor's region as a query parameter (`?region=uk`). Each region is then its own URL, so pages stay fully cacheable on WP Engine's page cache without cookies or geolocation, and no multilingual plugin is needed for four regions that share one language and one set of pages.
+
+A production multi-region site would go further:
+
+- **Subdirectory URLs** per region (`/uk/`, `/au/`), so each region is a clear, linkable, indexable section of the site.
+- **WPML or Polylang Pro** to manage regional versions of each page, with translation or localisation workflows for editors.
+- **Automatic `hreflang`** tags linking each page to its regional equivalents, so search engines show visitors the right version.
+- **Per-region XML sitemaps**, so each section is crawled and reported on separately.
+
+The code is ready for that switch: `Region::current()` passes its result through the `northwind_current_region` filter, so a plugin's language or region can replace the query parameter without changing the blocks or templates.
 
 ## Secrets
 
