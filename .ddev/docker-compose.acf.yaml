@@ -1,0 +1,12 @@
+# Passes the ACF Pro license key from the host into the web container.
+#
+# The key is read from the ACF_PRO_KEY environment variable of the shell that
+# runs `ddev start` (or from the gitignored .ddev/.env file). It is never
+# written to a tracked file. COMPOSER_AUTH is what Composer reads to
+# authenticate against the private ACF repository: the username is the license
+# key and the password is the site URL.
+services:
+  web:
+    environment:
+      - ACF_PRO_KEY=${ACF_PRO_KEY:-}
+      - COMPOSER_AUTH={"http-basic":{"connect.advancedcustomfields.com":{"username":"${ACF_PRO_KEY:-}","password":"https://northwind-demo.ddev.site"}}}

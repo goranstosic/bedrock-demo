@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+## Description: Install dependencies, WordPress and the seeded demo content
+## Usage: setup
+## Example: ddev setup
+
+set -euo pipefail
+
+cd /var/www/html
+
+if [ -z "${ACF_PRO_KEY:-}" ]; then
+	echo "ACF_PRO_KEY is not set." >&2
+	echo "Export it in your shell (export ACF_PRO_KEY=...) or add it to .ddev/.env," >&2
+	echo "then run: ddev restart && ddev setup" >&2
+	exit 1
+fi
+
+if [ ! -f .env ]; then
+	echo "Creating .env from .env.example"
+	cp .env.example .env
+	sed -i "s|^WP_HOME=.*|WP_HOME='${DDEV_PRIMARY_URL}'|" .env
+	# Replace every placeholder salt with its own random value.
+	php -r '
+		$env = file_get_contents( ".env" );
+		$env = preg_replace_callback(
+			"/generateme/",
+			static fn() => bin2hex( random_bytes( 32 ) ),
+			$env
+		);
+		file_put_contents( ".env", $env );
+	'
+fi
+
+echo "Installing Composer dependencies"
+composer install --no-interaction --no-progress
+
+if ! wp core is-installed 2>/dev/null; then
+	echo "Installing WordPress"
+	wp core install \
+		--url="${DDEV_PRIMARY_URL}" \
+		--title="Northwind Demo" \
+		--admin_user=admin \
+		--admin_password=admin \
+		--admin_email=admin@example.com \
+		--skip-email
+fi
+
+wp plugin activate advanced-custom-fields-pro redirection
+wp redirection database install
+wp theme activate northwind
+wp rewrite structure '/%postname%/'
+wp option update blogdescription "Demo marketing site built on Bedrock"
+
+wp northwind seed
+wp northwind redirects import data/redirects.csv
+
+wp rewrite flush
+
+echo
+echo "Done. Site:  ${DDEV_PRIMARY_URL}"
+echo "      Admin: ${DDEV_PRIMARY_URL}/wp/wp-admin (admin / admin)"
