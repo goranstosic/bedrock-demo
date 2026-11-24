@@ -1,0 +1,71 @@
+name: Deploy
+
+# staging deploys to the WP Engine staging environment, main to production.
+# Each GitHub environment ("staging", "production") holds:
+#   variable WPE_ENV               WP Engine environment name
+#   secret   WPE_SSHG_KEY_PRIVATE  private SSH key of the deploy user
+# The job skips the deploy, with a notice, until both are configured.
+# See docs/wpengine-deploy.md.
+
+on:
+  push:
+    branches: [staging, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Never cancel a deploy halfway; queue the next one instead.
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to WP Engine
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    env:
+      WPE_ENV: ${{ vars.WPE_ENV }}
+      COMPOSER_AUTH: '{"http-basic":{"connect.advancedcustomfields.com":{"username":"${{ secrets.ACF_PRO_KEY }}","password":"https://northwind-demo.ddev.site"}}}'
+    steps:
+      - name: Check the environment is configured
+        id: config
+        env:
+          HAS_KEY: ${{ secrets.WPE_SSHG_KEY_PRIVATE != '' }}
+        run: |
+          if [ -z "$WPE_ENV" ] || [ "$HAS_KEY" != "true" ]; then
+            echo "::notice::WP Engine is not configured for the ${{ github.ref_name }} branch. Skipping the deploy. See docs/wpengine-deploy.md."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.config.outputs.configured == 'true'
+
+      - uses: shivammathur/setup-php@v2
+        if: steps.config.outputs.configured == 'true'
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+
+      - name: Build the deploy artifact
+        if: steps.config.outputs.configured == 'true'
+        run: scripts/build-wpengine.sh
+
+      # REMOTE_PATH must be exactly "wp-content/": only then does the action
+      # add its protective excludes (uploads, WP Engine's own mu-plugins,
+      # drop-ins), which keeps --delete from removing them.
+      - name: Deploy wp-content
+        if: steps.config.outputs.configured == 'true'
+        uses: wpengine/github-action-wpe-site-deploy@v4
+        with:
+          WPE_SSHG_KEY_PRIVATE: ${{ secrets.WPE_SSHG_KEY_PRIVATE }}
+          WPE_ENV: ${{ vars.WPE_ENV }}
+          SRC_PATH: build/wp-content/
+          REMOTE_PATH: wp-content/
+          FLAGS: -azvr --inplace --delete --exclude=".*"
+          CACHE_CLEAR: TRUE
