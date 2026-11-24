@@ -1,15 +1,25 @@
 name: Deploy
 
-# staging deploys to the WP Engine staging environment, main to production.
-# Each GitHub environment ("staging", "production") holds:
+# Each long-lived branch deploys to its own WP Engine environment:
+#
+#   develop -> GitHub environment "development" -> WP Engine Development
+#   staging -> GitHub environment "staging"     -> WP Engine Staging
+#   main    -> GitHub environment "production"  -> WP Engine Production
+#
+# Each GitHub environment holds:
 #   variable WPE_ENV               WP Engine environment name
 #   secret   WPE_SSHG_KEY_PRIVATE  private SSH key of the deploy user
 # The job skips the deploy, with a notice, until both are configured.
+#
+# Optional repository secret DEPLOY_WEBHOOK_URL: a Slack or Microsoft Teams
+# incoming webhook that receives the result of every deploy, including
+# failures. No notification is sent when it is absent.
+#
 # See docs/wpengine-deploy.md.
 
 on:
   push:
-    branches: [staging, main]
+    branches: [develop, staging, main]
   workflow_dispatch:
 
 permissions:
@@ -23,9 +33,11 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to WP Engine
+    # A manual run from any other branch must not deploy anywhere.
+    if: contains(fromJSON('["develop", "staging", "main"]'), github.ref_name)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'staging' && 'staging' || 'development' }}
     env:
       WPE_ENV: ${{ vars.WPE_ENV }}
       COMPOSER_AUTH: '{"http-basic":{"connect.advancedcustomfields.com":{"username":"${{ secrets.ACF_PRO_KEY }}","password":"https://northwind-demo.ddev.site"}}}'
@@ -34,13 +46,15 @@ jobs:
         id: config
         env:
           HAS_KEY: ${{ secrets.WPE_SSHG_KEY_PRIVATE != '' }}
+          HAS_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK_URL != '' }}
         run: |
           if [ -z "$WPE_ENV" ] || [ "$HAS_KEY" != "true" ]; then
-            echo "::notice::WP Engine is not configured for the ${{ github.ref_name }} branch. Skipping the deploy. See docs/wpengine-deploy.md."
+            echo "::notice::WP Engine is not configured for the ${GITHUB_REF_NAME} branch. Skipping the deploy. See docs/wpengine-deploy.md."
             echo "configured=false" >> "$GITHUB_OUTPUT"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
+          echo "notify=${HAS_WEBHOOK}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v7
         if: steps.config.outputs.configured == 'true'
@@ -69,3 +83,19 @@ jobs:
           REMOTE_PATH: wp-content/
           FLAGS: -azvr --inplace --delete --exclude=".*"
           CACHE_CLEAR: TRUE
+
+      # Runs after success, failure or cancellation of a deploy that was
+      # attempted. Skipped deploys (WP Engine not configured) stay quiet.
+      # A broken webhook never turns a good deploy red.
+      - name: Notify
+        if: always() && steps.config.outputs.configured == 'true' && steps.config.outputs.notify == 'true'
+        continue-on-error: true
+        env:
+          WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+          RESULT: ${{ job.status }}
+          ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'staging' && 'staging' || 'development' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          AUTHOR: ${{ github.event.head_commit.author.name || github.actor }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: scripts/notify-deploy.sh
