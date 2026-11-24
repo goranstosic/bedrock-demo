@@ -1,0 +1,75 @@
+{
+    "key": "group_nw_block_client_story_cards",
+    "title": "Block: Client Story Cards",
+    "fields": [
+        {
+            "key": "field_nw_cards_heading",
+            "label": "Heading",
+            "name": "heading",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Shown above the cards. Leave empty to use \"Client stories\".",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": 80,
+            "placeholder": "Client stories",
+            "prepend": "",
+            "append": "",
+            "allow_in_bindings": 0
+        },
+        {
+            "key": "field_nw_cards_sector",
+            "label": "Sector",
+            "name": "sector",
+            "aria-label": "",
+            "type": "post_object",
+            "instructions": "Leave empty on a sector page to use that sector.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "sector"
+            ],
+            "post_status": [
+                "publish"
+            ],
+            "taxonomy": "",
+            "return_format": "id",
+            "multiple": 0,
+            "allow_null": 1,
+            "allow_in_bindings": 0,
+            "bidirectional": 0,
+            "ui": 1,
+            "bidirectional_target": []
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "block",
+                "operator": "==",
+                "value": "northwind/client-story-cards"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Editor controls for the Client Story Cards block.",
+    "show_in_rest": 0,
+    "modified": 1795500000
+}

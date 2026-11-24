@@ -1,0 +1,59 @@
+{
+    "key": "group_nw_client_story",
+    "title": "Client story: sectors",
+    "fields": [
+        {
+            "key": "field_nw_story_sectors",
+            "label": "Sectors",
+            "name": "sectors",
+            "aria-label": "",
+            "type": "relationship",
+            "instructions": "Sectors this story belongs to. Adding a sector here also adds this story to the sector.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "post_type": [
+                "sector"
+            ],
+            "post_status": [
+                "publish"
+            ],
+            "taxonomy": "",
+            "filters": [
+                "search"
+            ],
+            "return_format": "id",
+            "min": "",
+            "max": "",
+            "allow_in_bindings": 0,
+            "elements": "",
+            "bidirectional": 1,
+            "bidirectional_target": [
+                "field_nw_sector_client_stories"
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "client_story"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Bidirectional link from a client story to its sectors.",
+    "show_in_rest": 0,
+    "modified": 1795500000
+}
