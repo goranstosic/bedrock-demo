@@ -1,0 +1,10 @@
+source,target,code
+# Sample migration map. Lines starting with # are ignored.
+/industries/banking/,/sectors/financial-services/,301
+/industries/health/,/sectors/healthcare/,301
+/industries/utilities/,/sectors/energy-utilities/,301
+/industries/government/,/sectors/public-sector/,301
+/case-studies/,/client-stories/,301
+/case-studies/harbour-bank/,/client-stories/harbour-bank-onboarding/,301
+/case-studies/pennine-power/,/client-stories/pennine-power-maintenance/,301
+/about-us/,/,302

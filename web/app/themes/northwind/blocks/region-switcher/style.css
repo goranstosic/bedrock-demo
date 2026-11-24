@@ -1,0 +1,47 @@
+/* Region Switcher block. Tokens only: every value comes from theme.json. */
+
+.nw-region-switcher {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
+	font-size: var(--wp--preset--font-size--small);
+}
+
+.nw-region-switcher__label {
+	font-weight: 600;
+	color: var(--wp--preset--color--muted);
+}
+
+.nw-region-switcher__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wp--preset--spacing--20);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* At least 24 by 24 CSS pixels per target (WCAG 2.5.8). */
+.nw-region-switcher__link {
+	display: inline-block;
+	min-height: 1.5rem;
+	padding: 0.125rem var(--wp--preset--spacing--20);
+	border: 1px solid transparent;
+	border-radius: var(--wp--custom--radius);
+	color: var(--wp--preset--color--contrast);
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.nw-region-switcher__link:hover {
+	text-decoration: none;
+}
+
+/* The selected region is marked by more than colour (WCAG 1.4.1). */
+.nw-region-switcher__link[aria-current] {
+	border-color: var(--wp--preset--color--primary);
+	background: var(--wp--preset--color--surface);
+	font-weight: 700;
+	text-decoration: none;
+}

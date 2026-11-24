@@ -1,0 +1,14 @@
+name: northwind-demo
+type: wordpress
+docroot: web
+php_version: "8.3"
+webserver_type: nginx-fpm
+database:
+  type: mariadb
+  version: "10.11"
+composer_version: "2"
+nodejs_version: "22"
+
+# Bedrock owns wp-config.php and reads its settings from .env, so DDEV must
+# not generate wp-config-ddev.php or touch the existing config.
+disable_settings_management: true

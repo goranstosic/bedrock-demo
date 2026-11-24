@@ -1,0 +1,13 @@
+{
+  "name": "northwind-a11y",
+  "private": true,
+  "description": "Automated accessibility checks (axe-core) and keyboard checks for the Northwind Demo site.",
+  "license": "MIT",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.65.1"
+  }
+}

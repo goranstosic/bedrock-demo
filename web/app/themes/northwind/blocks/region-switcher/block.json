@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "northwind/region-switcher",
+	"title": "Region Switcher",
+	"description": "Lets visitors choose the region whose content they see. Used in the site header.",
+	"category": "northwind",
+	"icon": "admin-site-alt3",
+	"textdomain": "northwind",
+	"acf": {
+		"blockVersion": 3,
+		"mode": "preview",
+		"renderTemplate": "render.php"
+	},
+	"supports": {
+		"align": false,
+		"html": false,
+		"multiple": false,
+		"customClassName": false
+	},
+	"style": "file:./style.css"
+}

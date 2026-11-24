@@ -1,0 +1,46 @@
+/* Stats block. Tokens only: every value comes from theme.json. */
+
+.nw-stats {
+	padding-block: var(--wp--preset--spacing--60);
+}
+
+.nw-stats__heading {
+	margin-block: 0 var(--wp--preset--spacing--50);
+}
+
+.nw-stats__list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+	gap: var(--wp--preset--spacing--50);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.nw-stats__item {
+	padding: var(--wp--preset--spacing--50);
+	border-top: 4px solid var(--wp--preset--color--primary);
+	background: var(--wp--preset--color--surface);
+}
+
+.nw-stats__item > p {
+	margin: 0;
+}
+
+.nw-stats__number {
+	font-size: var(--wp--preset--font-size--xx-large);
+	font-weight: 700;
+	line-height: var(--wp--custom--line-height--tight);
+	color: var(--wp--preset--color--primary-dark);
+}
+
+.nw-stats__label {
+	margin-block-start: var(--wp--preset--spacing--20) !important;
+	font-weight: 600;
+}
+
+.nw-stats__source {
+	margin-block-start: var(--wp--preset--spacing--30) !important;
+	font-size: var(--wp--preset--font-size--small);
+	color: var(--wp--preset--color--muted);
+}

@@ -1,33 +1,25 @@
 {
-  "name": "roots/bedrock",
+  "name": "northwind/demo-site",
   "type": "project",
   "license": "MIT",
-  "description": "WordPress boilerplate with Composer, easier configuration, and an improved folder structure",
-  "homepage": "https://roots.io/bedrock/",
-  "authors": [
-    {
-      "name": "Scott Walkinshaw",
-      "email": "scott.walkinshaw@gmail.com",
-      "homepage": "https://github.com/swalkinshaw"
-    },
-    {
-      "name": "Ben Word",
-      "email": "ben@benword.com",
-      "homepage": "https://github.com/retlehs"
-    }
-  ],
+  "description": "Northwind Demo: a production-grade WordPress marketing site built on Roots Bedrock.",
   "keywords": [
-    "bedrock", "composer", "roots", "wordpress-composer", "wordpress", "wp-composer", "wp-config", "wp"
+    "bedrock", "wordpress", "composer", "acf", "block-theme", "wp-engine"
   ],
-  "support": {
-    "issues": "https://github.com/roots/bedrock/issues",
-    "forum": "https://discourse.roots.io/category/bedrock"
-  },
   "repositories": [
     {
-      "name": "wp-packages",
+      "name": "wpackagist",
       "type": "composer",
-      "url": "https://repo.wp-packages.org"
+      "url": "https://wpackagist.org",
+      "only": [
+        "wpackagist-plugin/*",
+        "wpackagist-theme/*"
+      ]
+    },
+    {
+      "name": "acf-pro",
+      "type": "composer",
+      "url": "https://connect.advancedcustomfields.com"
     }
   ],
   "require": {
@@ -36,22 +28,32 @@
     "oscarotero/env": "^2.0",
     "roots/bedrock-autoloader": "^1.0",
     "roots/bedrock-disallow-indexing": "^2.0",
-    "roots/wordpress": "7.1.5",
+    "roots/wordpress": "~7.1.5",
     "roots/wp-config": "^1.0",
     "vlucas/phpdotenv": "^5.0",
-    "wp-theme/twentytwentyfive": "^1.0"
+    "wpackagist-plugin/redirection": "^5.0",
+    "wpengine/advanced-custom-fields-pro": "^6.0"
   },
   "require-dev": {
-    "laravel/pint": "^1.0",
-    "pestphp/pest": "^4.0"
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "wp-coding-standards/wpcs": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Northwind\\Core\\": "web/app/mu-plugins/northwind-core/src/"
+    }
   },
   "config": {
     "optimize-autoloader": true,
     "preferred-install": "dist",
+    "platform": {
+      "php": "8.3.0"
+    },
     "allow-plugins": {
       "composer/installers": true,
       "roots/wordpress-core-installer": true,
-      "pestphp/pest-plugin": true
+      "dealerdirect/phpcodesniffer-composer-installer": true
     },
     "sort-packages": true
   },
@@ -72,8 +74,13 @@
     "wordpress-install-dir": "web/wp"
   },
   "scripts": {
-    "lint": "pint --test",
-    "lint:fix": "pint",
-    "test": "pest"
+    "lint": "phpcs",
+    "lint:fix": "phpcbf",
+    "build:wpengine": "bash scripts/build-wpengine.sh"
+  },
+  "scripts-descriptions": {
+    "lint": "Check PHP against the WordPress Coding Standards.",
+    "lint:fix": "Fix the coding standard violations that can be fixed automatically.",
+    "build:wpengine": "Build the flattened wp-content artifact that is deployed to WP Engine."
   }
 }

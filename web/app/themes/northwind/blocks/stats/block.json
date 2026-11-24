@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "northwind/stats",
+	"title": "Stats",
+	"description": "A short row of headline figures, each with a label and an optional source.",
+	"category": "northwind",
+	"icon": "chart-bar",
+	"keywords": [ "numbers", "figures", "metrics" ],
+	"textdomain": "northwind",
+	"acf": {
+		"blockVersion": 3,
+		"mode": "preview",
+		"renderTemplate": "render.php"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"anchor": true,
+		"html": false,
+		"customClassName": false
+	},
+	"style": "file:./style.css"
+}

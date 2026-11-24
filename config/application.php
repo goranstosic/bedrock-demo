@@ -157,6 +157,16 @@ Config::define('WP_POST_REVISIONS', env('WP_POST_REVISIONS') ?? true);
 Config::define('CONCATENATE_SCRIPTS', false);
 
 /**
+ * ACF Pro license
+ *
+ * The key is never stored in the repository. When ACF_PRO_KEY is present in
+ * the environment the plugin is activated automatically.
+ */
+if (env('ACF_PRO_KEY')) {
+    Config::define('ACF_PRO_LICENSE', env('ACF_PRO_KEY'));
+}
+
+/**
  * Debugging Settings
  */
 Config::define('WP_DEBUG_DISPLAY', false);
