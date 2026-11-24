@@ -1,0 +1,48 @@
+/*
+ * Global rules that theme.json cannot express.
+ *
+ * Keep this file small. Tokens belong in theme.json and block styles belong
+ * in the style.css of the block.
+ */
+
+/* One visible focus indicator for every interactive element (WCAG 2.4.7, 2.4.13). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+	outline: var(--wp--custom--focus--width) solid var(--wp--preset--color--focus);
+	outline-offset: var(--wp--custom--focus--offset);
+	border-radius: 2px;
+}
+
+/* Comfortable target size for navigation links (WCAG 2.5.8). */
+.wp-block-navigation .wp-block-navigation-item__content {
+	display: inline-block;
+	padding-block: 0.375rem;
+}
+
+.nw-site-header {
+	border-bottom: 1px solid var(--wp--preset--color--border);
+}
+
+.nw-site-footer {
+	border-top: 1px solid var(--wp--preset--color--border);
+	color: var(--wp--preset--color--muted);
+}
+
+/* Editor-only hint printed by blocks that have nothing to show yet. */
+.nw-editor-hint {
+	margin: 0;
+	padding: var(--wp--preset--spacing--40);
+	border: 1px dashed var(--wp--preset--color--border);
+	background: var(--wp--preset--color--surface);
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
