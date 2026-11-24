@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "northwind/client-story-cards",
+	"title": "Client Story Cards",
+	"description": "Cards linking to the client stories of a sector, filtered by the visitor's region. Shows nothing when there are no matching stories.",
+	"category": "northwind",
+	"icon": "awards",
+	"keywords": [ "case study", "sector", "cards" ],
+	"textdomain": "northwind",
+	"acf": {
+		"blockVersion": 3,
+		"mode": "preview",
+		"renderTemplate": "render.php"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"anchor": true,
+		"html": false,
+		"customClassName": false
+	},
+	"style": "file:./style.css"
+}
