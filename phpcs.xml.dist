@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<ruleset name="Northwind">
+	<description>WordPress Coding Standards for the code this project owns.</description>
+
+	<!-- Only project code. Bedrock's own config files follow PSR-12 upstream. -->
+	<file>web/app/mu-plugins/northwind-core</file>
+	<file>web/app/themes/northwind</file>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg name="parallel" value="8"/>
+	<arg value="sp"/>
+
+	<config name="testVersion" value="8.3-"/>
+	<config name="minimum_wp_version" value="6.6"/>
+
+	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress-Docs"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="northwind"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="northwind"/>
+				<element value="Northwind"/>
+			</property>
+		</properties>
+		<!--
+		ACF includes block templates from inside a function, so their variables
+		are local to that function and cannot collide with globals.
+		-->
+		<exclude-pattern>web/app/themes/northwind/blocks/*/render.php</exclude-pattern>
+	</rule>
+
+	<!-- Classes are PSR-4 autoloaded, so file names match class names. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>web/app/mu-plugins/northwind-core/src/*</exclude-pattern>
+	</rule>
+</ruleset>
